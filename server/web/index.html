@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>锚点</title>
+<style>
+/* ── Reset & Base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F9F7F3;--card:#FFFFFF;--text:#2D2B28;--muted:#8C8984;
+  --accent:#BF9D7A;--ai-bg:#F2EFE9;--border:#E6E2DA;--danger:#D4A0A0;
+  --shadow:0 1px 3px rgba(0,0,0,.04);
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
+  line-height:1.85;min-height:100vh;display:flex;justify-content:center;
+}
+.page{
+  width:100%;max-width:480px;padding:3rem 1.5rem 4rem;
+  animation:fadeUp .5s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none!important}
+button,input,textarea{font-family:inherit;border:none;outline:none;color:inherit;font-size:inherit;background:none}
+button{cursor:pointer}
+input,textarea{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;width:100%;font-size:.95rem;transition:border-color .3s}
+input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+
+/* ── Typography ── */
+.serif{font-family:"Songti SC","Noto Serif SC",Georgia,"SimSun",serif}
+.display{font-size:2rem;letter-spacing:.08em;line-height:1.5;font-weight:400}
+.title{font-size:1.25rem;letter-spacing:.05em;font-weight:400}
+.body-text{line-height:2;color:var(--text)}
+.meta{font-size:.8rem;color:var(--muted);letter-spacing:.03em}
+.em-text{font-size:1.05rem;line-height:2.1;color:var(--text);text-align:center}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-block;padding:.75rem 2.2rem;font-size:.95rem;border-radius:2rem;
+  letter-spacing:.04em;transition:all .25s;text-align:center;
+}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-ghost{color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* ── Cards ── */
+.card{background:var(--card);border-radius:var(--radius);padding:1.4rem 1.5rem;box-shadow:var(--shadow);border:1px solid var(--border)}
+
+/* ── Landing ── */
+.landing-wrap{text-align:center;padding-top:5rem}
+.landing-line{font-size:1.5rem;letter-spacing:.05em;margin-bottom:2.2rem;line-height:1.8}
+.landing-input{width:100%;font-size:2rem;text-align:center;padding:.6rem 0;border:none;border-bottom:2px solid var(--border);border-radius:0;background:none;letter-spacing:.08em}
+.landing-input:focus{border-bottom-color:var(--accent)}
+.landing-input::placeholder{color:#D5D0C7}
+.landing-next{margin-top:2rem;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.landing-next.show{opacity:1;transform:translateY(0)}
+
+/* ── Relationship ── */
+.rel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:1.5rem 0}
+.rel-btn{padding:.7rem .2rem;font-size:.9rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;transition:all .2s}
+.rel-btn:hover{border-color:var(--accent)}
+.rel-btn.sel{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* ── Home ── */
+.home-name{font-size:2.5rem;text-align:center;margin-bottom:.15rem}
+.home-rel{text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:.9rem}
+.home-card .intro-line{line-height:2.1;text-align:center;margin-bottom:1.8rem}
+.progress-wrap{margin-bottom:1.8rem}
+.progress-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:.5rem}
+.progress-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.progress-num{font-size:.75rem;color:var(--muted);text-align:center;display:block}
+.home-actions{display:flex;flex-direction:column;gap:.7rem;align-items:center}
+.done-msg{text-align:center;line-height:2.2;margin-bottom:1.5rem}
+
+/* ── Anchor Pack Card ── */
+.anchor-card{margin-top:1.5rem;padding:1.8rem;text-align:center;background:linear-gradient(135deg,#FDFAF5,#F9F4EB);border:1px solid #E8DFD0;border-radius:var(--radius)}
+.anchor-card .anchor-label{font-size:.7rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
+.anchor-card .anchor-text{font-size:1.1rem;line-height:2.2;margin-bottom:1.2rem;letter-spacing:.03em}
+.anchor-card .anchor-question{font-size:.9rem;color:var(--accent);font-style:italic}
+
+/* ── Doors ── */
+.door-list{display:flex;flex-direction:column;gap:.5rem}
+.door-item{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.3rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);transition:all .2s;width:100%}
+.door-item:hover:not(.locked){border-color:var(--accent);transform:translateX(3px)}
+.door-item.done{border-color:var(--accent);opacity:.8}
+.door-item.locked{opacity:.3;cursor:not-allowed}
+.door-name{font-size:1.15rem;letter-spacing:.06em}
+.door-status{font-size:.75rem;color:var(--muted)}
+.door-item.done .door-status{color:var(--accent)}
+
+/* ── Chat ── */
+.chat-wrap{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;width:100%}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.chat-chapter{font-size:.95rem;letter-spacing:.05em}
+.chat-log{flex:1;overflow-y:auto;padding:1.5rem 1.2rem;display:flex;flex-direction:column;gap:1rem}
+.bubble{max-width:85%;padding:.7rem 1rem;border-radius:1rem;line-height:1.8;font-size:.9rem;animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.bubble.ai{align-self:flex-start;background:var(--ai-bg);border-bottom-left-radius:.2rem}
+.bubble.user{align-self:flex-end;background:var(--text);color:#fff;border-bottom-right-radius:.2rem}
+.bubble.typing{color:var(--muted);font-size:1.2rem;letter-spacing:.15em}
+.chat-footer{display:flex;gap:.6rem;padding:.9rem 1.2rem;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.chat-footer input{flex:1;border-radius:1.5rem;padding:.65rem 1rem}
+.btn-send{padding:.65rem 1.3rem;background:var(--text);color:#fff;border-radius:1.5rem;font-size:.85rem;transition:opacity .2s;white-space:nowrap}
+.btn-send:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Memories ── */
+.memory-item{padding:1rem 1.3rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:.5rem;cursor:pointer;transition:all .2s}
+.memory-item:hover{border-color:var(--accent)}
+.memory-chapter{font-size:.7rem;color:var(--muted);letter-spacing:.08em;margin-bottom:.3rem}
+.memory-preview{font-size:.9rem;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.memory-detail{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:2rem;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}}
+.memory-detail .card{max-width:440px;width:100%;max-height:80vh;overflow-y:auto}
+.memory-detail .chapter-tag{font-size:.7rem;color:var(--accent);letter-spacing:.1em;margin-bottom:1rem}
+.memory-detail .full-text{font-size:1rem;line-height:2.1;white-space:pre-wrap}
+.memory-detail .close-btn{margin-top:1.5rem;text-align:center}
+
+/* ── Nav / Back ── */
+.nav-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem}
+.btn-back{font-size:.85rem;color:var(--muted);transition:color .2s;padding:.3rem 0}
+.btn-back:hover{color:var(--text)}
+
+/* ── Empty State ── */
+.empty-state{text-align:center;padding:3rem 1rem}
+.empty-state p{color:var(--muted);line-height:2;font-size:.95rem}
+
+/* ── Chapter Intro (for "还有件事") ── */
+.chapter-intro{text-align:center;padding:2rem 0;line-height:2.2;color:var(--text);font-size:1rem}
+</style>
+</head>
+<body>
+
+<!-- ====== LANDING ====== -->
+<div id="landing" class="page">
+  <div class="landing-wrap">
+    <p class="landing-line">跟我说一个人吧。</p>
+    <input class="landing-input" id="landingName" placeholder="名字" autocomplete="off">
+    <div class="landing-next" id="landingNext">
+      <button class="btn btn-primary" onclick="goRel()">继续</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== RELATIONSHIP ====== -->
+<div id="rel" class="page hidden">
+  <p class="landing-line" style="text-align:center"><span id="relName"></span>是你的什么人？</p>
+  <div class="rel-grid" id="relGrid"></div>
+  <div class="landing-next" id="relNextWrap" style="text-align:center">
+    <button class="btn btn-primary" id="relNextBtn">好了，开始吧</button>
+  </div>
+</div>
+
+<!-- ====== HOME ====== -->
+<div id="home" class="page hidden">
+  <h1 class="home-name serif" id="homeName"></h1>
+  <p class="home-rel" id="homeRel"></p>
+  <div class="card home-card" id="homeCard"></div>
+</div>
+
+<!-- ====== DOORS ====== -->
+<div id="doors" class="page hidden">
+  <div class="nav-row">
+    <button class="btn-back" onclick="loadHome()">← 返回</button>
+  </div>
+  <p class="em-text" style="margin-bottom:2rem">五扇门。按任何顺序推开都行。<br>想先进哪扇就进哪扇。</p>
+  <div class="door-list" id="doorList"></div>
+</div>
+
+<!-- ====== CHAT ====== -->
+<div id="chatPage" class="chat-wrap hidden">
+  <div class="chat-header">
+    <button class="btn-back" onclick="backToDoors()">← 返回</button>
+    <span class="chat-chapter" id="chatTitle"></span>
+    <button class="btn-back" id="chatFinish" style="color:var(--accent)">完成本章</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-footer">
+    <input id="chatInput" placeholder="输入你的回答..." autocomplete="off">
+    <button class="btn-send" id="chatSend">发送</button>
+  </div>
+</div>
+
+<!-- ====== MEMORIES ====== -->
+<div id="memories" class="page hidden">
+  <div class="nav-row">
+    <button class="btn-back" onclick="loadHome()">← 返回</button>
+  </div>
+  <p class="title serif" style="margin-bottom:1.5rem">关于<span id="memName"></span></p>
+  <p class="meta" style="margin-bottom:1.5rem">这些都是你说过的。</p>
+  <div id="memList"></div>
+</div>
+
+<script>
+// ── State ──
+const S={subject:null,progress:null,sessionId:null,activeChapter:null,loading:false};
+function API(path,opts={}){
+  return fetch('/api/v1'+path,{headers:{'Content-Type':'application/json'},...opts})
+    .then(r=>r.ok?r.json():r.json().then(e=>{throw new Error(e.error||'fail')}));
+}
+
+// ── Views ──
+function show(id){
+  document.querySelectorAll('.page,.chat-wrap').forEach(e=>e.classList.add('hidden'));
+  const el=document.getElementById(id);
+  if(el)el.classList.remove('hidden');
+}
+
+// ── Landing ──
+const landingName=document.getElementById('landingName');
+const landingNext=document.getElementById('landingNext');
+landingName.addEventListener('input',()=>{
+  landingNext.classList.toggle('show',landingName.value.trim().length>0);
+});
+landingName.addEventListener('keydown',e=>{if(e.key==='Enter'&&landingName.value.trim())goRel();});
+
+function goRel(){
+  const n=landingName.value.trim();if(!n)return;
+  S.subjectName=n;document.getElementById('relName').textContent=n;
+  show('rel');
+}
+
+// ── Relationship ──
+(function(){
+  const rels=['妈妈','爸爸','外婆','外公','奶奶','爷爷','爱人','朋友'];
+  const grid=document.getElementById('relGrid');
+  const nextBtn=document.getElementById('relNextBtn');
+  const nextWrap=document.getElementById('relNextWrap');
+  let sel='';
+  nextWrap.style.opacity='0';nextWrap.style.transform='translateY(6px)';nextWrap.style.transition='opacity .4s,transform .4s';
+  rels.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='rel-btn';b.textContent=r;
+    b.onclick=()=>{
+      document.querySelectorAll('.rel-btn').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');sel=r;
+      nextWrap.style.opacity='1';nextWrap.style.transform='translateY(0)';
+    };
+    grid.appendChild(b);
+  });
+  nextBtn.onclick=async()=>{
+    if(!sel)return;
+    nextBtn.textContent='...';nextBtn.disabled=true;
+    try{
+      const res=await API('/subjects',{method:'POST',body:JSON.stringify({name:S.subjectName,relationship:sel})});
+      S.subject={id:res.id,name:S.subjectName,relationship:sel};
+      localStorage.setItem('anchor_sub',JSON.stringify(S.subject));
+      loadHome();
+    }catch(e){alert('出错了，请重试');nextBtn.textContent='好了，开始吧';nextBtn.disabled=false;}
+  };
+})();
+
+// ── Home ──
+async function loadHome(){
+  document.getElementById('homeName').textContent=S.subject.name;
+  document.getElementById('homeRel').textContent='我的'+S.subject.relationship;
+  try{S.progress=await API('/subjects/'+S.subject.id+'/interviews/progress');}catch(e){S.progress=null;}
+  try{S.memories=await API('/subjects/'+S.subject.id+'/memories');}catch(e){S.memories=[];}
+  renderHome();
+  show('home');
+}
+function renderHome(){
+  const card=document.getElementById('homeCard');
+  if(!S.progress){card.innerHTML='<p style="text-align:center;color:var(--muted)">加载中...</p>';return;}
+  const done=S.progress.chapters.filter(c=>c.status==='completed').length;
+  const allDone=done===5;
+  const hasMemories=S.memories&&S.memories.length>0;
+
+  let html='';
+  if(allDone){
+    html=`<p class="done-msg">五章都完成了。<br>关于${S.subject.name}，你已经说了很多。<br>每天下午三点，会有一段记忆推给你。</p>`;
+  }else{
+    html=`<p class="intro-line">我们不会聊她的病。<br>不会聊任何让你觉得重的东西。<br>只聊她这个人。</p>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${(done/5)*100}%"></div></div><span class="progress-num">${done}/5 章</span></div>`;
+  }
+  html+=`<div class="home-actions">`;
+  html+=`<button class="btn ${allDone?'btn-ghost':'btn-primary'}" onclick="loadDoors()">${done===0?'开始了解她':allDone?'再次回顾':'继续'}</button>`;
+  if(hasMemories)html+=`<button class="btn btn-ghost" onclick="loadMemories()">看看你说过的</button>`;
+  html+=`</div>`;
+
+  // Show latest anchor pack if any done
+  if(done>0&&S.memories&&S.memories.length>0){
+    const latest=S.memories[0];
+    html+=`<div class="anchor-card">
+      <div class="anchor-label">最近的记忆片段</div>
+      <div class="anchor-text">${escapeHtml(latest.raw_text.length>80?latest.raw_text.slice(0,80)+'...':latest.raw_text)}</div>
+      <div class="anchor-question">—— ${latest.chapter} · 锚定潜力 ${latest.anchor_potential}/10</div>
+    </div>`;
+  }
+
+  card.innerHTML=html;
+}
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+// ── Doors ──
+const chapters=[
+  {key:'手',title:'手',desc:'她用手做过什么'},
+  {key:'声音',title:'声音',desc:'她的声音什么样'},
+  {key:'地方',title:'地方',desc:'她在哪里长大'},
+  {key:'那一天',title:'那一天',desc:'选一天'},
+  {key:'还有件事',title:'还有件事',desc:'想跟她说的话'},
+];
+function getChStatus(key){
+  if(!S.progress)return'locked';
+  const ch=S.progress.chapters.find(c=>c.chapter===key);
+  if(!ch)return'locked';
+  return ch.status==='in_progress'?'available':ch.status;
+}
+async function loadDoors(){
+  try{S.progress=await API('/subjects/'+S.subject.id+'/interviews/progress');}catch(e){}
+  const list=document.getElementById('doorList');
+  list.innerHTML=chapters.map(ch=>{
+    const s=getChStatus(ch.key);
+    const cls=s==='completed'?'door-item done':(s==='locked'?'door-item locked':'door-item');
+    const label=s==='completed'?'✓':(s==='in_progress'?'进行中':ch.desc);
+    return `<button class="${cls}" data-ch="${ch.key}" ${s==='locked'?'disabled':''}>
+      <span class="door-name">${ch.title}</span><span class="door-status">${label}</span></button>`;
+  }).join('');
+  list.querySelectorAll('.door-item:not(.locked)').forEach(b=>{
+    b.addEventListener('click',()=>enterChapter(b.dataset.ch));
+  });
+  show('doors');
+}
+
+// ── Chat ──
+async function enterChapter(key){
+  S.activeChapter=key;S.messages=[];
+  document.getElementById('chatLog').innerHTML='';
+  document.getElementById('chatInput').value='';
+  document.getElementById('chatInput').disabled=true;
+  document.getElementById('chatSend').disabled=true;
+  document.getElementById('chatTitle').textContent=chapters.find(c=>c.key===key).title;
+  show('chatPage');
+  addTyping();
+  try{
+    const d=await API('/subjects/'+S.subject.id+'/interviews/'+encodeURIComponent(key)+'/start',{method:'POST'});
+    S.sessionId=d.session_id;
+    removeTyping();addMsg('ai',d.message);
+    document.getElementById('chatInput').disabled=false;
+    document.getElementById('chatSend').disabled=false;
+    document.getElementById('chatInput').focus();
+  }catch(e){removeTyping();addMsg('ai','出了点问题，请返回重试。');}
+}
+function addMsg(role,text){
+  const d=document.createElement('div');d.className='bubble '+role;d.textContent=text;
+  document.getElementById('chatLog').appendChild(d);
+  document.getElementById('chatLog').scrollTop=document.getElementById('chatLog').scrollHeight;
+}
+function addTyping(){
+  const d=document.createElement('div');d.className='bubble ai typing';d.id='typing';d.textContent='...';
+  document.getElementById('chatLog').appendChild(d);
+  document.getElementById('chatLog').scrollTop=document.getElementById('chatLog').scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typing');if(e)e.remove();}
+async function sendMsg(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();if(!text||S.loading)return;
+  S.loading=true;inp.value='';inp.disabled=true;document.getElementById('chatSend').disabled=true;
+  addMsg('user',text);addTyping();
+  try{
+    const d=await API('/subjects/'+S.subject.id+'/interviews/respond',{method:'POST',body:JSON.stringify({session_id:S.sessionId,content:text})});
+    removeTyping();if(d.message)addMsg('ai',d.message);
+  }catch(e){removeTyping();addMsg('ai','抱歉，出了点问题。再试一次。');}
+  S.loading=false;inp.disabled=false;document.getElementById('chatSend').disabled=false;inp.focus();
+}
+document.getElementById('chatSend').addEventListener('click',sendMsg);
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+function backToDoors(){loadDoors();}
+document.getElementById('chatFinish').addEventListener('click',async()=>{
+  if(S.loading)return;S.loading=true;
+  document.getElementById('chatFinish').textContent='...';
+  try{await API('/subjects/'+S.subject.id+'/interviews/complete',{method:'POST',body:JSON.stringify({session_id:S.sessionId})});}catch(e){}
+  S.loading=false;document.getElementById('chatFinish').textContent='完成本章';
+  loadDoors();
+});
+
+// ── Memories ──
+async function loadMemories(){
+  try{S.memories=await API('/subjects/'+S.subject.id+'/memories');}catch(e){S.memories=[];}
+  document.getElementById('memName').textContent=S.subject.name;
+  const list=document.getElementById('memList');
+  if(!S.memories||S.memories.length===0){
+    list.innerHTML='<div class="empty-state"><p>还没有记忆。<br>先去完成一两章吧。</p></div>';
+  }else{
+    list.innerHTML=S.memories.map((m,i)=>`
+      <div class="memory-item" onclick="showMemory(${i})">
+        <div class="memory-chapter">${m.chapter} · 潜力 ${m.anchor_potential}/10</div>
+        <div class="memory-preview">${escapeHtml(m.raw_text)}</div>
+      </div>`).join('');
+  }
+  show('memories');
+}
+function showMemory(i){
+  const m=S.memories[i];
+  const overlay=document.createElement('div');
+  overlay.className='memory-detail';
+  overlay.innerHTML=`<div class="card">
+    <div class="chapter-tag">${m.chapter} · 锚定潜力 ${m.anchor_potential}/10</div>
+    <div class="full-text">${escapeHtml(m.raw_text)}</div>
+    <div class="close-btn"><button class="btn btn-ghost" onclick="this.closest('.memory-detail').remove()">关闭</button></div>
+  </div>`;
+  overlay.addEventListener('click',function(e){if(e.target===this)this.remove();});
+  document.body.appendChild(overlay);
+}
+
+// ── Init ──
+(function(){
+  const saved=localStorage.getItem('anchor_sub');
+  if(saved){S.subject=JSON.parse(saved);loadHome();}
+})();
+</script>
+</body>
+</html>
