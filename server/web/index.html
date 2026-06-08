@@ -2,417 +2,696 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>锚点</title>
 <style>
-/* ── Reset & Base ── */
+/* ═══════════════════════════════════════════════════════
+   锚点 — 手写信纸
+   设计：泛黄纸色，深棕墨迹，私密温柔的质感
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --paper:    #F5F0E5;
+  --card:     #FBFAF6;
+  --ink:      #3D3226;
+  --ink-dim:  #6B5E4E;
+  --ink-lt:   #9E9182;
+  --gold:     #B89550;
+  --gold-dim: #A08040;
+  --border:   #E2DCCE;
+  --ai-bg:    #F2EDE2;
+  --danger:   #B87060;
+  --shadow:   0 1px 3px rgba(61,50,38,0.04);
+  --radius:   8px;
+  --radius-lg:14px;
+  --font-sans: "PingFang SC","Noto Sans SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+  --font-serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --ease: cubic-bezier(0.4,0,0.2,1);
+}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#F9F7F3;--card:#FFFFFF;--text:#2D2B28;--muted:#8C8984;
-  --accent:#BF9D7A;--ai-bg:#F2EFE9;--border:#E6E2DA;--danger:#D4A0A0;
-  --shadow:0 1px 3px rgba(0,0,0,.04);
-  --radius:12px;--radius-sm:8px;
-}
-html{font-size:16px}
+html{font-size:16px;-webkit-tap-highlight-color:transparent;background:var(--paper)}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
-  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
-  line-height:1.85;min-height:100vh;display:flex;justify-content:center;
+  font-family:var(--font-sans);background:var(--paper);color:var(--ink);
+  -webkit-font-smoothing:antialiased;line-height:1.85;min-height:100vh;min-height:100dvh;
+  display:flex;justify-content:center;overflow-x:hidden;
 }
-.page{
-  width:100%;max-width:480px;padding:3rem 1.5rem 4rem;
-  animation:fadeUp .5s ease;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.hidden{display:none!important}
-button,input,textarea{font-family:inherit;border:none;outline:none;color:inherit;font-size:inherit;background:none}
+button,input{font-family:inherit;border:none;outline:none;color:inherit;font-size:inherit;background:none}
 button{cursor:pointer}
-input,textarea{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;width:100%;font-size:.95rem;transition:border-color .3s}
-input:focus,textarea:focus{border-color:var(--accent)}
-input::placeholder,textarea::placeholder{color:var(--muted)}
+input{width:100%}
+
+/* ── Layout ── */
+.page{
+  width:100%;max-width:480px;padding:2.5rem 1.8rem 4rem;
+  animation:pageIn .55s var(--ease) both;
+}
+.page-hidden{display:none!important}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* ── Typography ── */
-.serif{font-family:"Songti SC","Noto Serif SC",Georgia,"SimSun",serif}
-.display{font-size:2rem;letter-spacing:.08em;line-height:1.5;font-weight:400}
-.title{font-size:1.25rem;letter-spacing:.05em;font-weight:400}
-.body-text{line-height:2;color:var(--text)}
-.meta{font-size:.8rem;color:var(--muted);letter-spacing:.03em}
-.em-text{font-size:1.05rem;line-height:2.1;color:var(--text);text-align:center}
+.serif{font-family:var(--font-serif)}
+.tc{text-align:center}
 
 /* ── Buttons ── */
 .btn{
-  display:inline-block;padding:.75rem 2.2rem;font-size:.95rem;border-radius:2rem;
-  letter-spacing:.04em;transition:all .25s;text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:.7rem 2rem;font-size:.9rem;letter-spacing:.05em;
+  border-radius:2rem;transition:all .3s var(--ease);white-space:nowrap;min-width:110px;
 }
-.btn-primary{background:var(--text);color:#fff}
-.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
-.btn-ghost{color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--accent)}
-.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-primary{
+  background:var(--ink);color:#FBFAF6;
+  box-shadow:0 2px 8px rgba(61,50,38,0.1);
+}
+.btn-primary:hover{background:#2A221A;transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,50,38,0.15)}
+.btn-ghost{border:1px solid var(--border);color:var(--ink-dim);background:transparent}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-dim)}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-sm{padding:.4rem 1rem;font-size:.78rem;min-width:auto}
+
+.btn-back{
+  font-size:.82rem;color:var(--ink-lt);padding:.3rem 0;
+  letter-spacing:.04em;transition:color .25s;
+}
+.btn-back:hover{color:var(--ink)}
 
 /* ── Cards ── */
-.card{background:var(--card);border-radius:var(--radius);padding:1.4rem 1.5rem;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card{
+  background:var(--card);border-radius:var(--radius-lg);
+  padding:1.8rem;border:1px solid var(--border);box-shadow:var(--shadow);
+}
 
-/* ── Landing ── */
-.landing-wrap{text-align:center;padding-top:5rem}
-.landing-line{font-size:1.5rem;letter-spacing:.05em;margin-bottom:2.2rem;line-height:1.8}
-.landing-input{width:100%;font-size:2rem;text-align:center;padding:.6rem 0;border:none;border-bottom:2px solid var(--border);border-radius:0;background:none;letter-spacing:.08em}
-.landing-input:focus{border-bottom-color:var(--accent)}
-.landing-input::placeholder{color:#D5D0C7}
-.landing-next{margin-top:2rem;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
-.landing-next.show{opacity:1;transform:translateY(0)}
+/* ═══════════════════════════════════════════════════════
+   INTRO — 产品介绍（手写信封面）
+   ═══════════════════════════════════════════════════════ */
+.intro-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;min-height:100dvh;
+  text-align:center;
+}
 
-/* ── Relationship ── */
-.rel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:1.5rem 0}
-.rel-btn{padding:.7rem .2rem;font-size:.9rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;transition:all .2s}
-.rel-btn:hover{border-color:var(--accent)}
-.rel-btn.sel{background:var(--text);color:#fff;border-color:var(--text)}
+.intro-mark{
+  font-family:var(--font-serif);font-size:4.5rem;font-weight:300;
+  letter-spacing:.2em;color:var(--ink);margin-bottom:.5rem;
+}
 
-/* ── Home ── */
-.home-name{font-size:2.5rem;text-align:center;margin-bottom:.15rem}
-.home-rel{text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:.9rem}
-.home-card .intro-line{line-height:2.1;text-align:center;margin-bottom:1.8rem}
-.progress-wrap{margin-bottom:1.8rem}
-.progress-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:.5rem}
-.progress-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.progress-num{font-size:.75rem;color:var(--muted);text-align:center;display:block}
-.home-actions{display:flex;flex-direction:column;gap:.7rem;align-items:center}
-.done-msg{text-align:center;line-height:2.2;margin-bottom:1.5rem}
+.intro-sub{
+  font-family:var(--font-serif);font-size:1.1rem;
+  color:var(--ink-dim);letter-spacing:.08em;margin-bottom:3rem;
+}
 
-/* ── Anchor Pack Card ── */
-.anchor-card{margin-top:1.5rem;padding:1.8rem;text-align:center;background:linear-gradient(135deg,#FDFAF5,#F9F4EB);border:1px solid #E8DFD0;border-radius:var(--radius)}
-.anchor-card .anchor-label{font-size:.7rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
-.anchor-card .anchor-text{font-size:1.1rem;line-height:2.2;margin-bottom:1.2rem;letter-spacing:.03em}
-.anchor-card .anchor-question{font-size:.9rem;color:var(--accent);font-style:italic}
+.intro-rule{
+  width:30px;height:1px;background:var(--gold-dim);
+  margin:0 auto 3rem;opacity:.7;
+}
 
-/* ── Doors ── */
-.door-list{display:flex;flex-direction:column;gap:.5rem}
-.door-item{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.3rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);transition:all .2s;width:100%}
-.door-item:hover:not(.locked){border-color:var(--accent);transform:translateX(3px)}
-.door-item.done{border-color:var(--accent);opacity:.8}
-.door-item.locked{opacity:.3;cursor:not-allowed}
-.door-name{font-size:1.15rem;letter-spacing:.06em}
-.door-status{font-size:.75rem;color:var(--muted)}
-.door-item.done .door-status{color:var(--accent)}
+.intro-desc{
+  font-family:var(--font-serif);font-size:1.05rem;
+  color:var(--ink-lt);letter-spacing:.06em;line-height:2.5;
+  margin-bottom:2rem;
+}
 
-/* ── Chat ── */
-.chat-wrap{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;width:100%}
-.chat-header{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
-.chat-chapter{font-size:.95rem;letter-spacing:.05em}
-.chat-log{flex:1;overflow-y:auto;padding:1.5rem 1.2rem;display:flex;flex-direction:column;gap:1rem}
-.bubble{max-width:85%;padding:.7rem 1rem;border-radius:1rem;line-height:1.8;font-size:.9rem;animation:pop .4s ease}
-@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.bubble.ai{align-self:flex-start;background:var(--ai-bg);border-bottom-left-radius:.2rem}
-.bubble.user{align-self:flex-end;background:var(--text);color:#fff;border-bottom-right-radius:.2rem}
-.bubble.typing{color:var(--muted);font-size:1.2rem;letter-spacing:.15em}
-.chat-footer{display:flex;gap:.6rem;padding:.9rem 1.2rem;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
-.chat-footer input{flex:1;border-radius:1.5rem;padding:.65rem 1rem}
-.btn-send{padding:.65rem 1.3rem;background:var(--text);color:#fff;border-radius:1.5rem;font-size:.85rem;transition:opacity .2s;white-space:nowrap}
-.btn-send:disabled{opacity:.35;cursor:not-allowed}
+.intro-note{
+  font-size:.82rem;color:var(--ink-lt);letter-spacing:.04em;
+  line-height:2.1;max-width:300px;margin:0 auto 3rem;
+}
 
-/* ── Memories ── */
-.memory-item{padding:1rem 1.3rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:.5rem;cursor:pointer;transition:all .2s}
-.memory-item:hover{border-color:var(--accent)}
-.memory-chapter{font-size:.7rem;color:var(--muted);letter-spacing:.08em;margin-bottom:.3rem}
-.memory-preview{font-size:.9rem;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.memory-detail{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:2rem;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0}}
-.memory-detail .card{max-width:440px;width:100%;max-height:80vh;overflow-y:auto}
-.memory-detail .chapter-tag{font-size:.7rem;color:var(--accent);letter-spacing:.1em;margin-bottom:1rem}
-.memory-detail .full-text{font-size:1rem;line-height:2.1;white-space:pre-wrap}
-.memory-detail .close-btn{margin-top:1.5rem;text-align:center}
+/* ═══════════════════════════════════════════════════════
+   NAME INPUT
+   ═══════════════════════════════════════════════════════ */
+.name-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:80vh;min-height:80dvh;
+}
+.name-prompt{
+  font-family:var(--font-serif);font-size:1.4rem;
+  letter-spacing:.06em;color:var(--ink);margin-bottom:2.5rem;
+}
+.name-input{
+  width:100%;font-size:2.6rem;text-align:center;padding:.4rem 0;
+  border-bottom:1.5px solid var(--border);border-radius:0;
+  letter-spacing:.1em;color:var(--ink);font-family:var(--font-serif);
+  transition:border-color .4s;
+}
+.name-input:focus{border-bottom-color:var(--gold)}
+.name-input::placeholder{color:#D5CFC2}
+.name-next{
+  margin-top:2.2rem;opacity:0;transform:translateY(6px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.name-next.visible{opacity:1;transform:translateY(0)}
 
-/* ── Nav / Back ── */
-.nav-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem}
-.btn-back{font-size:.85rem;color:var(--muted);transition:color .2s;padding:.3rem 0}
-.btn-back:hover{color:var(--text)}
+/* ═══════════════════════════════════════════════════════
+   RELATIONSHIP
+   ═══════════════════════════════════════════════════════ */
+.rel-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:80vh;min-height:80dvh;
+}
+.rel-q{
+  font-family:var(--font-serif);font-size:1.2rem;
+  letter-spacing:.06em;color:var(--ink);margin-bottom:2rem;
+}
+.rel-q .hl{color:var(--gold-dim)}
 
-/* ── Empty State ── */
-.empty-state{text-align:center;padding:3rem 1rem}
-.empty-state p{color:var(--muted);line-height:2;font-size:.95rem}
+.rel-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:.5rem;width:100%;max-width:310px;
+}
+.rel-btn{
+  padding:.8rem .3rem;font-size:.88rem;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius);
+  letter-spacing:.05em;transition:all .25s var(--ease);
+  text-align:center;color:var(--ink-dim);
+}
+.rel-btn:hover{border-color:var(--gold-dim);color:var(--ink)}
+.rel-btn.sel{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.rel-confirm{
+  margin-top:2rem;opacity:0;transform:translateY(6px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.rel-confirm.visible{opacity:1;transform:translateY(0)}
 
-/* ── Chapter Intro (for "还有件事") ── */
-.chapter-intro{text-align:center;padding:2rem 0;line-height:2.2;color:var(--text);font-size:1rem}
+/* ═══════════════════════════════════════════════════════
+   HOME
+   ═══════════════════════════════════════════════════════ */
+.home-header{text-align:center;margin-bottom:2rem}
+.home-name{
+  font-family:var(--font-serif);font-size:3rem;font-weight:300;
+  letter-spacing:.12em;line-height:1.3;color:var(--ink);
+}
+.home-rel{font-size:.8rem;color:var(--ink-lt);margin-top:.3rem;letter-spacing:.06em}
+
+.home-card{text-align:center}
+.home-intro{line-height:2.1;color:var(--ink-dim);margin-bottom:1.5rem}
+.progress-wrap{margin-bottom:1.5rem}
+.progress-bar{
+  height:1.5px;background:var(--border);border-radius:1px;
+  overflow:hidden;margin-bottom:.5rem;
+}
+.progress-fill{
+  height:100%;background:var(--gold);border-radius:1px;
+  transition:width .8s var(--ease);
+}
+.progress-label{font-size:.7rem;color:var(--ink-lt);letter-spacing:.05em}
+.home-actions{display:flex;flex-direction:column;gap:.55rem;align-items:center}
+
+/* 记忆片段卡 */
+.teaser{
+  margin-top:1.5rem;padding:1.3rem;background:linear-gradient(180deg,#FDFBF6,#F8F3E8);
+  border:1px solid #E8E0D0;border-radius:var(--radius);text-align:center;
+}
+.teaser-line{
+  width:30px;height:1px;background:var(--gold-dim);margin:0 auto .9rem;opacity:.6;
+}
+.teaser-label{font-size:.62rem;color:var(--gold-dim);letter-spacing:.14em;margin-bottom:.7rem}
+.teaser-text{
+  font-family:var(--font-serif);font-size:.9rem;line-height:2;
+  color:var(--ink-dim);margin-bottom:.4rem;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.teaser-meta{font-size:.68rem;color:var(--ink-lt)}
+
+/* ═══════════════════════════════════════════════════════
+   DOORS
+   ═══════════════════════════════════════════════════════ */
+.doors-hint{
+  font-family:var(--font-serif);font-size:.98rem;
+  text-align:center;line-height:2;color:var(--ink-dim);margin-bottom:2rem;
+}
+.door-list{display:flex;flex-direction:column;gap:.4rem}
+.door-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.1rem 1.3rem;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius);
+  transition:all .3s var(--ease);width:100%;color:var(--ink);
+}
+.door-item:hover:not(.locked){border-color:var(--gold-dim);transform:translateX(4px);box-shadow:var(--shadow)}
+.door-item.done{border-color:var(--gold-dim);opacity:.85}
+.door-item.done .door-name{color:var(--gold-dim)}
+.door-item.locked{opacity:.22;cursor:not-allowed}
+.door-name{font-size:1.2rem;letter-spacing:.08em;font-family:var(--font-serif)}
+.door-status{font-size:.7rem;color:var(--ink-lt);letter-spacing:.04em}
+.door-item.done .door-status{color:var(--gold-dim)}
+
+/* ═══════════════════════════════════════════════════════
+   CHAT
+   ═══════════════════════════════════════════════════════ */
+.chat-wrap{
+  display:flex;flex-direction:column;height:100vh;height:100dvh;
+  max-width:480px;width:100%;margin:0 auto;background:var(--paper);
+}
+.chat-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1.2rem;border-bottom:1px solid var(--border);
+  flex-shrink:0;gap:.8rem;
+}
+.chat-chapter{font-size:1rem;letter-spacing:.06em;font-family:var(--font-serif);color:var(--ink-dim)}
+.chat-done{font-size:.78rem;color:var(--gold-dim);padding:.3rem .6rem;letter-spacing:.04em;transition:color .25s}
+.chat-done:hover{color:var(--gold)}
+
+.chat-log{
+  flex:1;overflow-y:auto;padding:1.2rem;
+  display:flex;flex-direction:column;gap:.7rem;
+  -webkit-overflow-scrolling:touch;
+}
+.bubble{
+  max-width:85%;padding:.65rem 1rem;border-radius:.9rem;
+  line-height:1.8;font-size:.88rem;animation:bubbleIn .4s var(--ease) both;
+  word-break:break-word;
+}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.bubble.ai{
+  align-self:flex-start;background:var(--ai-bg);
+  border-bottom-left-radius:.15rem;color:var(--ink-dim);
+  border:1px solid var(--border);
+}
+.bubble.user{
+  align-self:flex-end;background:var(--ink);
+  color:var(--card);border-bottom-right-radius:.15rem;
+}
+.typing-dots{align-self:flex-start;padding:.5rem 1rem;display:flex;gap:5px}
+.typing-dots span{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--ink-lt);animation:dotBounce 1.5s infinite both}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotBounce{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:.8;transform:scale(1.2)}}
+
+.chat-bar{
+  display:flex;gap:.5rem;padding:.7rem 1.2rem;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.chat-bar input{
+  flex:1;padding:.6rem 1rem;background:var(--card);
+  border:1px solid var(--border);border-radius:1.5rem;
+  font-size:.88rem;color:var(--ink);transition:border-color .3s;
+}
+.chat-bar input:focus{border-color:var(--gold-dim)}
+.chat-bar input::placeholder{color:var(--ink-lt)}
+.btn-send{
+  padding:.6rem 1.2rem;background:var(--ink);color:var(--card);
+  border-radius:1.5rem;font-size:.85rem;transition:all .25s;
+  white-space:nowrap;letter-spacing:.04em;
+}
+.btn-send:hover{background:#2A221A}
+.btn-send:disabled{opacity:.25;cursor:not-allowed}
+
+/* ═══════════════════════════════════════════════════════
+   MEMORIES
+   ═══════════════════════════════════════════════════════ */
+.mem-head{border-bottom:1px solid var(--border);padding-bottom:.7rem;margin-bottom:1.8rem}
+
+.memory-item{
+  padding:1rem 1.2rem;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:.4rem;cursor:pointer;
+  transition:all .3s var(--ease);
+}
+.memory-item:hover{border-color:var(--gold-dim);box-shadow:var(--shadow)}
+.mem-chapter{font-size:.62rem;color:var(--gold-dim);letter-spacing:.1em;margin-bottom:.3rem}
+.mem-excerpt{font-size:.84rem;line-height:1.8;color:var(--ink-dim);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mem-meta{font-size:.68rem;color:var(--ink-lt);margin-top:.3rem;display:flex;gap:1rem}
+.empty-mem{text-align:center;padding:4rem 1rem}
+.empty-mem p{color:var(--ink-lt);line-height:2;font-size:.85rem}
+
+/* ═══════════════════════════════════════════════════════
+   OVERLAY
+   ═══════════════════════════════════════════════════════ */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(50,42,32,.55);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem;animation:fadeIn .3s ease both;
+  backdrop-filter:blur(3px);
+}
+.overlay .card{
+  max-width:440px;width:100%;max-height:72vh;overflow-y:auto;
+  animation:overlayIn .4s var(--ease) both;
+}
+@keyframes overlayIn{from{opacity:0;transform:scale(.94) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.detail-chapter{font-size:.65rem;color:var(--gold-dim);letter-spacing:.12em;margin-bottom:1rem}
+.detail-text{font-family:var(--font-serif);font-size:.95rem;line-height:2.2;color:var(--ink-dim);white-space:pre-wrap}
+.detail-tags{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.4rem}
+.detail-tag{font-size:.66rem;padding:.2rem .6rem;background:var(--ai-bg);border-radius:1rem;color:var(--ink-lt);letter-spacing:.04em}
+.detail-close{margin-top:1.4rem;text-align:center}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+@media(max-width:400px){
+  .page{padding:2rem 1.2rem 3rem}
+  .intro-mark{font-size:3.5rem}
+  .home-name{font-size:2.4rem}
+  .name-input{font-size:2.2rem}
+}
 </style>
 </head>
 <body>
 
-<!-- ====== LANDING ====== -->
-<div id="landing" class="page">
-  <div class="landing-wrap">
-    <p class="landing-line">跟我说一个人吧。</p>
-    <input class="landing-input" id="landingName" placeholder="名字" autocomplete="off">
-    <div class="landing-next" id="landingNext">
-      <button class="btn btn-primary" onclick="goRel()">继续</button>
-    </div>
+<!-- ═══════════════════════════════════════════════════════
+  介绍页
+  ═══════════════════════════════════════════════════════ -->
+<div id="intro" class="page page-hidden intro-wrap">
+  <div class="intro-mark">锚点</div>
+  <p class="intro-sub">为所爱之人，留下记忆的锚。</p>
+  <div class="intro-rule"></div>
+  <p class="intro-desc">
+    一个安静的回忆空间。<br>
+    不分析、不评价、不替代。<br>
+    只陪你聊聊你心里那个人。
+  </p>
+  <button class="btn btn-primary" onclick="startApp()">开始</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+  名字输入
+  ═══════════════════════════════════════════════════════ -->
+<div id="name-page" class="page page-hidden name-wrap">
+  <p class="name-prompt">跟我说一个人吧。</p>
+  <input class="name-input" id="nameInput" placeholder="名字" autocomplete="off" maxlength="30">
+  <div class="name-next" id="nameNext">
+    <button class="btn btn-primary" id="nameNextBtn">继续</button>
   </div>
 </div>
 
-<!-- ====== RELATIONSHIP ====== -->
-<div id="rel" class="page hidden">
-  <p class="landing-line" style="text-align:center"><span id="relName"></span>是你的什么人？</p>
+<!-- ═══════════════════════════════════════════════════════
+  关系选择
+  ═══════════════════════════════════════════════════════ -->
+<div id="rel-page" class="page page-hidden rel-wrap">
+  <p class="rel-q"><span class="hl" id="relNameDisplay"></span>是你的什么人？</p>
   <div class="rel-grid" id="relGrid"></div>
-  <div class="landing-next" id="relNextWrap" style="text-align:center">
-    <button class="btn btn-primary" id="relNextBtn">好了，开始吧</button>
+  <div class="rel-confirm" id="relConfirm">
+    <button class="btn btn-primary" id="relConfirmBtn">好了，开始吧</button>
   </div>
 </div>
 
-<!-- ====== HOME ====== -->
-<div id="home" class="page hidden">
-  <h1 class="home-name serif" id="homeName"></h1>
-  <p class="home-rel" id="homeRel"></p>
+<!-- ═══════════════════════════════════════════════════════
+  首页
+  ═══════════════════════════════════════════════════════ -->
+<div id="home" class="page page-hidden">
+  <div class="home-header">
+    <h1 class="home-name serif" id="homeName"></h1>
+    <p class="home-rel" id="homeRel"></p>
+  </div>
   <div class="card home-card" id="homeCard"></div>
 </div>
 
-<!-- ====== DOORS ====== -->
-<div id="doors" class="page hidden">
-  <div class="nav-row">
-    <button class="btn-back" onclick="loadHome()">← 返回</button>
+<!-- ═══════════════════════════════════════════════════════
+  五扇门
+  ═══════════════════════════════════════════════════════ -->
+<div id="doors" class="page page-hidden">
+  <div style="margin-bottom:1.2rem">
+    <button class="btn-back" onclick="goHome()">← 返回</button>
   </div>
-  <p class="em-text" style="margin-bottom:2rem">五扇门。按任何顺序推开都行。<br>想先进哪扇就进哪扇。</p>
+  <p class="doors-hint">五扇门。想先进哪扇就进哪扇。</p>
   <div class="door-list" id="doorList"></div>
 </div>
 
-<!-- ====== CHAT ====== -->
-<div id="chatPage" class="chat-wrap hidden">
-  <div class="chat-header">
-    <button class="btn-back" onclick="backToDoors()">← 返回</button>
+<!-- ═══════════════════════════════════════════════════════
+  聊天
+  ═══════════════════════════════════════════════════════ -->
+<div id="chat" class="page-hidden chat-wrap">
+  <div class="chat-top">
+    <button class="btn-back" onclick="closeChat()">← 返回</button>
     <span class="chat-chapter" id="chatTitle"></span>
-    <button class="btn-back" id="chatFinish" style="color:var(--accent)">完成本章</button>
+    <button class="chat-done" id="chatFinish">完成</button>
   </div>
   <div class="chat-log" id="chatLog"></div>
-  <div class="chat-footer">
-    <input id="chatInput" placeholder="输入你的回答..." autocomplete="off">
+  <div class="chat-bar">
+    <input id="chatInput" placeholder="说说..." autocomplete="off" maxlength="2000">
     <button class="btn-send" id="chatSend">发送</button>
   </div>
 </div>
 
-<!-- ====== MEMORIES ====== -->
-<div id="memories" class="page hidden">
-  <div class="nav-row">
-    <button class="btn-back" onclick="loadHome()">← 返回</button>
+<!-- ═══════════════════════════════════════════════════════
+  记忆
+  ═══════════════════════════════════════════════════════ -->
+<div id="memories" class="page page-hidden">
+  <div style="margin-bottom:1.2rem">
+    <button class="btn-back" onclick="goHome()">← 返回</button>
   </div>
-  <p class="title serif" style="margin-bottom:1.5rem">关于<span id="memName"></span></p>
-  <p class="meta" style="margin-bottom:1.5rem">这些都是你说过的。</p>
+  <div class="mem-head">
+    <span class="serif" style="font-size:1.3rem;letter-spacing:.06em;color:var(--gold-dim)">关于</span>
+    <span class="serif" style="font-size:1.3rem;letter-spacing:.06em" id="memFor"></span>
+  </div>
+  <p style="font-size:.72rem;color:var(--ink-lt);letter-spacing:.04em;margin-bottom:1.5rem">这些都是你说过的。每个片段都是一枚锚点。</p>
   <div id="memList"></div>
 </div>
 
 <script>
-// ── State ──
-const S={subject:null,progress:null,sessionId:null,activeChapter:null,loading:false};
-function API(path,opts={}){
+'use strict';
+
+const S={subject:null,progress:null,sessionId:null,activeChapter:null,memories:[],loading:false};
+
+function api(path,opts={}){
   return fetch('/api/v1'+path,{headers:{'Content-Type':'application/json'},...opts})
     .then(r=>r.ok?r.json():r.json().then(e=>{throw new Error(e.error||'fail')}));
 }
 
-// ── Views ──
 function show(id){
-  document.querySelectorAll('.page,.chat-wrap').forEach(e=>e.classList.add('hidden'));
+  document.querySelectorAll('.page,.chat-wrap').forEach(el=>el.classList.add('page-hidden'));
   const el=document.getElementById(id);
-  if(el)el.classList.remove('hidden');
+  if(!el)return;
+  el.classList.remove('page-hidden');
+  el.style.animation='none';el.offsetHeight;el.style.animation='';
 }
 
-// ── Landing ──
-const landingName=document.getElementById('landingName');
-const landingNext=document.getElementById('landingNext');
-landingName.addEventListener('input',()=>{
-  landingNext.classList.toggle('show',landingName.value.trim().length>0);
-});
-landingName.addEventListener('keydown',e=>{if(e.key==='Enter'&&landingName.value.trim())goRel();});
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-function goRel(){
-  const n=landingName.value.trim();if(!n)return;
-  S.subjectName=n;document.getElementById('relName').textContent=n;
-  show('rel');
-}
-
-// ── Relationship ──
-(function(){
-  const rels=['妈妈','爸爸','外婆','外公','奶奶','爷爷','爱人','朋友'];
-  const grid=document.getElementById('relGrid');
-  const nextBtn=document.getElementById('relNextBtn');
-  const nextWrap=document.getElementById('relNextWrap');
-  let sel='';
-  nextWrap.style.opacity='0';nextWrap.style.transform='translateY(6px)';nextWrap.style.transition='opacity .4s,transform .4s';
-  rels.forEach(r=>{
-    const b=document.createElement('button');
-    b.className='rel-btn';b.textContent=r;
-    b.onclick=()=>{
-      document.querySelectorAll('.rel-btn').forEach(x=>x.classList.remove('sel'));
-      b.classList.add('sel');sel=r;
-      nextWrap.style.opacity='1';nextWrap.style.transform='translateY(0)';
-    };
-    grid.appendChild(b);
-  });
-  nextBtn.onclick=async()=>{
-    if(!sel)return;
-    nextBtn.textContent='...';nextBtn.disabled=true;
-    try{
-      const res=await API('/subjects',{method:'POST',body:JSON.stringify({name:S.subjectName,relationship:sel})});
-      S.subject={id:res.id,name:S.subjectName,relationship:sel};
-      localStorage.setItem('anchor_sub',JSON.stringify(S.subject));
-      loadHome();
-    }catch(e){alert('出错了，请重试');nextBtn.textContent='好了，开始吧';nextBtn.disabled=false;}
-  };
-})();
-
-// ── Home ──
-async function loadHome(){
-  document.getElementById('homeName').textContent=S.subject.name;
-  document.getElementById('homeRel').textContent='我的'+S.subject.relationship;
-  try{S.progress=await API('/subjects/'+S.subject.id+'/interviews/progress');}catch(e){S.progress=null;}
-  try{S.memories=await API('/subjects/'+S.subject.id+'/memories');}catch(e){S.memories=[];}
-  renderHome();
-  show('home');
-}
-function renderHome(){
-  const card=document.getElementById('homeCard');
-  if(!S.progress){card.innerHTML='<p style="text-align:center;color:var(--muted)">加载中...</p>';return;}
-  const done=S.progress.chapters.filter(c=>c.status==='completed').length;
-  const allDone=done===5;
-  const hasMemories=S.memories&&S.memories.length>0;
-
-  let html='';
-  if(allDone){
-    html=`<p class="done-msg">五章都完成了。<br>关于${S.subject.name}，你已经说了很多。<br>每天下午三点，会有一段记忆推给你。</p>`;
-  }else{
-    html=`<p class="intro-line">我们不会聊她的病。<br>不会聊任何让你觉得重的东西。<br>只聊她这个人。</p>
-    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${(done/5)*100}%"></div></div><span class="progress-num">${done}/5 章</span></div>`;
-  }
-  html+=`<div class="home-actions">`;
-  html+=`<button class="btn ${allDone?'btn-ghost':'btn-primary'}" onclick="loadDoors()">${done===0?'开始了解她':allDone?'再次回顾':'继续'}</button>`;
-  if(hasMemories)html+=`<button class="btn btn-ghost" onclick="loadMemories()">看看你说过的</button>`;
-  html+=`</div>`;
-
-  // Show latest anchor pack if any done
-  if(done>0&&S.memories&&S.memories.length>0){
-    const latest=S.memories[0];
-    html+=`<div class="anchor-card">
-      <div class="anchor-label">最近的记忆片段</div>
-      <div class="anchor-text">${escapeHtml(latest.raw_text.length>80?latest.raw_text.slice(0,80)+'...':latest.raw_text)}</div>
-      <div class="anchor-question">—— ${latest.chapter} · 锚定潜力 ${latest.anchor_potential}/10</div>
-    </div>`;
-  }
-
-  card.innerHTML=html;
-}
-function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-
-// ── Doors ──
-const chapters=[
+const CHAPTERS=[
   {key:'手',title:'手',desc:'她用手做过什么'},
   {key:'声音',title:'声音',desc:'她的声音什么样'},
   {key:'地方',title:'地方',desc:'她在哪里长大'},
   {key:'那一天',title:'那一天',desc:'选一天'},
   {key:'还有件事',title:'还有件事',desc:'想跟她说的话'},
 ];
+
+// ═══════════════════════════════════════════════════════
+// INTRO → NAME
+// ═══════════════════════════════════════════════════════
+function startApp(){show('name-page')}
+
+// ═══════════════════════════════════════════════════════
+// NAME INPUT
+// ═══════════════════════════════════════════════════════
+(function(){
+  const inp=document.getElementById('nameInput');
+  const next=document.getElementById('nameNext');
+  const btn=document.getElementById('nameNextBtn');
+
+  inp.addEventListener('input',()=>next.classList.toggle('visible',inp.value.trim().length>0));
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim())go()});
+  btn.addEventListener('click',go);
+
+  function go(){
+    const n=inp.value.trim();if(!n)return;
+    S.subjectName=n;
+    document.getElementById('relNameDisplay').textContent=n;
+    show('rel-page');
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
+// RELATIONSHIP
+// ═══════════════════════════════════════════════════════
+(function(){
+  const rels=['妈妈','爸爸','外婆','外公','奶奶','爷爷','爱人','朋友','老师'];
+  const grid=document.getElementById('relGrid');
+  const confirm=document.getElementById('relConfirm');
+  const btn=document.getElementById('relConfirmBtn');
+  let sel='';
+
+  rels.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='rel-btn';b.textContent=r;
+    b.addEventListener('click',()=>{
+      grid.querySelectorAll('.rel-btn').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');sel=r;confirm.classList.add('visible');
+    });
+    grid.appendChild(b);
+  });
+
+  btn.addEventListener('click',async()=>{
+    if(!sel)return;
+    btn.textContent='...';btn.disabled=true;
+    try{
+      const res=await api('/subjects',{method:'POST',body:JSON.stringify({name:S.subjectName,relationship:sel})});
+      S.subject={id:res.id,name:S.subjectName,relationship:sel};
+      localStorage.setItem('anchor_sub',JSON.stringify(S.subject));
+      await loadHome();
+    }catch(e){btn.textContent='好了，开始吧';btn.disabled=false;}
+  });
+})();
+
+// ═══════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════
+async function loadHome(){
+  if(!S.subject)return;
+  document.getElementById('homeName').textContent=S.subject.name;
+  document.getElementById('homeRel').textContent='我的'+S.subject.relationship;
+  try{S.progress=await api('/subjects/'+S.subject.id+'/interviews/progress')}catch(e){S.progress=null}
+  try{S.memories=await api('/subjects/'+S.subject.id+'/memories')}catch(e){S.memories=[]}
+  renderHome();show('home');
+}
+
+function renderHome(){
+  const card=document.getElementById('homeCard');
+  if(!S.progress){card.innerHTML='<p class="tc" style="color:var(--ink-lt)">...</p>';return}
+  const done=S.progress.chapters.filter(c=>c.status==='completed').length;
+  const all=done===5;
+  let h='';
+  if(all){
+    h+=`<p class="home-intro">五章都完成了。<br>关于<span class="serif" style="color:var(--ink)">${esc(S.subject.name)}</span>，你已经说了很多。</p>`;
+  }else{
+    h+=`<p class="home-intro">不聊沉重的东西。<br>只聊她这个人。</p>`;
+    h+=`<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${(done/5)*100}%"></div></div><span class="progress-label">${done} / 5</span></div>`;
+  }
+  h+=`<div class="home-actions">`;
+  h+=`<button class="btn ${all?'btn-ghost':'btn-primary'}" id="goDoors">${done===0?'开始了解她':all?'再次回顾':'继续'}</button>`;
+  if(S.memories&&S.memories.length>0)h+=`<button class="btn btn-ghost" id="goMem">看看你说过的</button>`;
+  h+=`</div>`;
+  if(S.memories&&S.memories.length>0){
+    const m=S.memories[0];
+    const p=m.raw_text.length>90?m.raw_text.slice(0,90)+'...':m.raw_text;
+    h+=`<div class="teaser"><div class="teaser-line"></div><div class="teaser-label">最近的记忆片段</div><div class="teaser-text">${esc(p)}</div><div class="teaser-meta">—— ${m.chapter} · 锚定值 ${m.anchor_potential}/10</div></div>`;
+  }
+  card.innerHTML=h;
+  document.getElementById('goDoors').addEventListener('click',loadDoors);
+  const mb=document.getElementById('goMem');if(mb)mb.addEventListener('click',loadMemories);
+}
+
+function goHome(){loadHome()}
+
+// ═══════════════════════════════════════════════════════
+// DOORS
+// ═══════════════════════════════════════════════════════
 function getChStatus(key){
   if(!S.progress)return'locked';
   const ch=S.progress.chapters.find(c=>c.chapter===key);
   if(!ch)return'locked';
-  return ch.status==='in_progress'?'available':ch.status;
+  if(ch.status==='in_progress')return'available';
+  return ch.status;
 }
+
 async function loadDoors(){
-  try{S.progress=await API('/subjects/'+S.subject.id+'/interviews/progress');}catch(e){}
+  try{S.progress=await api('/subjects/'+S.subject.id+'/interviews/progress')}catch(e){}
   const list=document.getElementById('doorList');
-  list.innerHTML=chapters.map(ch=>{
+  list.innerHTML=CHAPTERS.map(ch=>{
     const s=getChStatus(ch.key);
-    const cls=s==='completed'?'door-item done':(s==='locked'?'door-item locked':'door-item');
+    let cls='door-item';
+    if(s==='completed')cls+=' done';
+    if(s==='locked')cls+=' locked';
     const label=s==='completed'?'✓':(s==='in_progress'?'进行中':ch.desc);
-    return `<button class="${cls}" data-ch="${ch.key}" ${s==='locked'?'disabled':''}>
-      <span class="door-name">${ch.title}</span><span class="door-status">${label}</span></button>`;
+    return`<button class="${cls}" data-ch="${ch.key}" ${s==='locked'?'disabled':''}><span class="door-name">${ch.title}</span><span class="door-status">${label}</span></button>`;
   }).join('');
-  list.querySelectorAll('.door-item:not(.locked)').forEach(b=>{
-    b.addEventListener('click',()=>enterChapter(b.dataset.ch));
-  });
+  list.querySelectorAll('.door-item:not(.locked)').forEach(b=>b.addEventListener('click',()=>enterChapter(b.dataset.ch)));
   show('doors');
 }
 
-// ── Chat ──
+// ═══════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════
+const chatInput=document.getElementById('chatInput');
+const chatSend=document.getElementById('chatSend');
+const chatLog=document.getElementById('chatLog');
+const chatTitle=document.getElementById('chatTitle');
+const chatFinish=document.getElementById('chatFinish');
+
 async function enterChapter(key){
-  S.activeChapter=key;S.messages=[];
-  document.getElementById('chatLog').innerHTML='';
-  document.getElementById('chatInput').value='';
-  document.getElementById('chatInput').disabled=true;
-  document.getElementById('chatSend').disabled=true;
-  document.getElementById('chatTitle').textContent=chapters.find(c=>c.key===key).title;
-  show('chatPage');
+  const ch=CHAPTERS.find(c=>c.key===key);if(!ch)return;
+  S.activeChapter=ch;S.sessionId=null;
+  chatLog.innerHTML='';chatTitle.textContent=ch.title;
+  chatInput.value='';setChat(false);
+  show('chat');
   addTyping();
   try{
-    const d=await API('/subjects/'+S.subject.id+'/interviews/'+encodeURIComponent(key)+'/start',{method:'POST'});
-    S.sessionId=d.session_id;
-    removeTyping();addMsg('ai',d.message);
-    document.getElementById('chatInput').disabled=false;
-    document.getElementById('chatSend').disabled=false;
-    document.getElementById('chatInput').focus();
-  }catch(e){removeTyping();addMsg('ai','出了点问题，请返回重试。');}
+    const d=await api('/subjects/'+S.subject.id+'/interviews/'+encodeURIComponent(key)+'/start',{method:'POST'});
+    S.sessionId=d.session_id;removeTyping();addBubble('ai',d.message);
+    setChat(true);chatInput.focus();
+  }catch(e){removeTyping();addBubble('ai','出了点问题，请返回重试。')}
 }
-function addMsg(role,text){
+
+function setChat(v){chatInput.disabled=!v;chatSend.disabled=!v}
+function addBubble(role,text){
   const d=document.createElement('div');d.className='bubble '+role;d.textContent=text;
-  document.getElementById('chatLog').appendChild(d);
-  document.getElementById('chatLog').scrollTop=document.getElementById('chatLog').scrollHeight;
+  chatLog.appendChild(d);chatLog.scrollTop=chatLog.scrollHeight;
 }
 function addTyping(){
-  const d=document.createElement('div');d.className='bubble ai typing';d.id='typing';d.textContent='...';
-  document.getElementById('chatLog').appendChild(d);
-  document.getElementById('chatLog').scrollTop=document.getElementById('chatLog').scrollHeight;
+  const d=document.createElement('div');d.className='typing-dots';d.id='typing';
+  d.innerHTML='<span></span><span></span><span></span>';
+  chatLog.appendChild(d);chatLog.scrollTop=chatLog.scrollHeight;
 }
-function removeTyping(){const e=document.getElementById('typing');if(e)e.remove();}
+function removeTyping(){const e=document.getElementById('typing');if(e)e.remove()}
+
 async function sendMsg(){
-  const inp=document.getElementById('chatInput');
-  const text=inp.value.trim();if(!text||S.loading)return;
-  S.loading=true;inp.value='';inp.disabled=true;document.getElementById('chatSend').disabled=true;
-  addMsg('user',text);addTyping();
+  const t=chatInput.value.trim();if(!t||S.loading||!S.sessionId)return;
+  S.loading=true;chatInput.value='';setChat(false);
+  addBubble('user',t);addTyping();
   try{
-    const d=await API('/subjects/'+S.subject.id+'/interviews/respond',{method:'POST',body:JSON.stringify({session_id:S.sessionId,content:text})});
-    removeTyping();if(d.message)addMsg('ai',d.message);
-  }catch(e){removeTyping();addMsg('ai','抱歉，出了点问题。再试一次。');}
-  S.loading=false;inp.disabled=false;document.getElementById('chatSend').disabled=false;inp.focus();
+    const d=await api('/subjects/'+S.subject.id+'/interviews/respond',{method:'POST',body:JSON.stringify({session_id:S.sessionId,content:t})});
+    removeTyping();if(d.message)addBubble('ai',d.message);
+  }catch(e){removeTyping();addBubble('ai','抱歉，出了点问题。再试一次。')}
+  S.loading=false;setChat(true);chatInput.focus();
 }
-document.getElementById('chatSend').addEventListener('click',sendMsg);
-document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
-function backToDoors(){loadDoors();}
-document.getElementById('chatFinish').addEventListener('click',async()=>{
-  if(S.loading)return;S.loading=true;
-  document.getElementById('chatFinish').textContent='...';
-  try{await API('/subjects/'+S.subject.id+'/interviews/complete',{method:'POST',body:JSON.stringify({session_id:S.sessionId})});}catch(e){}
-  S.loading=false;document.getElementById('chatFinish').textContent='完成本章';
-  loadDoors();
+chatSend.addEventListener('click',sendMsg);
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}});
+
+async function closeChat(){S.activeChapter=null;S.sessionId=null;await loadDoors()}
+
+chatFinish.addEventListener('click',async()=>{
+  if(S.loading||!S.sessionId)return;
+  S.loading=true;chatFinish.textContent='...';
+  try{await api('/subjects/'+S.subject.id+'/interviews/complete',{method:'POST',body:JSON.stringify({session_id:S.sessionId})})}catch(e){}
+  chatFinish.textContent='完成';S.loading=false;await closeChat();
 });
 
-// ── Memories ──
+// ═══════════════════════════════════════════════════════
+// MEMORIES
+// ═══════════════════════════════════════════════════════
 async function loadMemories(){
-  try{S.memories=await API('/subjects/'+S.subject.id+'/memories');}catch(e){S.memories=[];}
-  document.getElementById('memName').textContent=S.subject.name;
+  try{S.memories=await api('/subjects/'+S.subject.id+'/memories')}catch(e){S.memories=[]}
+  document.getElementById('memFor').textContent=S.subject.name;
   const list=document.getElementById('memList');
   if(!S.memories||S.memories.length===0){
-    list.innerHTML='<div class="empty-state"><p>还没有记忆。<br>先去完成一两章吧。</p></div>';
+    list.innerHTML='<div class="empty-mem"><p>还没有记忆。<br>先去完成一两章吧。</p></div>';
   }else{
     list.innerHTML=S.memories.map((m,i)=>`
-      <div class="memory-item" onclick="showMemory(${i})">
-        <div class="memory-chapter">${m.chapter} · 潜力 ${m.anchor_potential}/10</div>
-        <div class="memory-preview">${escapeHtml(m.raw_text)}</div>
-      </div>`).join('');
+      <div class="memory-item" data-idx="${i}">
+        <div class="mem-chapter">${esc(m.chapter)}</div>
+        <div class="mem-excerpt">${esc(m.raw_text)}</div>
+        <div class="mem-meta"><span>锚定值 ${m.anchor_potential}/10</span>${m.has_music?'<span>&#9835; 音乐记忆</span>':''}</div>
+      </div>
+    `).join('');
+    list.querySelectorAll('.memory-item').forEach(el=>el.addEventListener('click',()=>showDetail(parseInt(el.dataset.idx))));
   }
   show('memories');
 }
-function showMemory(i){
-  const m=S.memories[i];
-  const overlay=document.createElement('div');
-  overlay.className='memory-detail';
-  overlay.innerHTML=`<div class="card">
-    <div class="chapter-tag">${m.chapter} · 锚定潜力 ${m.anchor_potential}/10</div>
-    <div class="full-text">${escapeHtml(m.raw_text)}</div>
-    <div class="close-btn"><button class="btn btn-ghost" onclick="this.closest('.memory-detail').remove()">关闭</button></div>
-  </div>`;
-  overlay.addEventListener('click',function(e){if(e.target===this)this.remove();});
-  document.body.appendChild(overlay);
+
+function showDetail(idx){
+  const m=S.memories[idx];
+  const ov=document.createElement('div');ov.className='overlay';
+  let tags='';
+  if(m.has_music)tags+='<span class="detail-tag">&#9835; 音乐记忆</span>';
+  if(m.is_procedural)tags+='<span class="detail-tag">习惯动作</span>';
+  if(m.anchor_potential>=7)tags+='<span class="detail-tag">高锚定值</span>';
+  ov.innerHTML=`<div class="card"><div class="detail-chapter">${esc(m.chapter)} · 锚定值 ${m.anchor_potential}/10</div><div class="detail-text">${esc(m.raw_text)}</div>${tags?'<div class="detail-tags">'+tags+'</div>':''}<div class="detail-close"><button class="btn btn-ghost btn-sm close-detail">关闭</button></div></div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  ov.querySelector('.close-detail').addEventListener('click',()=>ov.remove());
+  document.body.appendChild(ov);
 }
 
-// ── Init ──
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
 (function(){
+  if(window.location.search.includes('reset')){localStorage.clear();window.location.replace('/');return}
   const saved=localStorage.getItem('anchor_sub');
-  if(saved){S.subject=JSON.parse(saved);loadHome();}
+  if(saved){
+    try{S.subject=JSON.parse(saved);loadHome()}catch(e){localStorage.removeItem('anchor_sub');show('intro')}
+  }else{
+    show('intro');
+  }
 })();
 </script>
 </body>
