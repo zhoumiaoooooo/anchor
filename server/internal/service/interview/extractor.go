@@ -22,7 +22,7 @@ func (e *Engine) extractFragments(session *model.InterviewSession) (int, error) 
 		if msg.Role != model.RoleUser || msg.IsDangerSignal {
 			continue
 		}
-		if len([]rune(msg.Content)) < 15 {
+		if !shouldExtractMessage(session.Chapter, msg.Content) {
 			continue
 		}
 
@@ -38,6 +38,17 @@ func (e *Engine) extractFragments(session *model.InterviewSession) (int, error) 
 	}
 
 	return count, nil
+}
+
+func shouldExtractMessage(chapter model.Chapter, content string) bool {
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return false
+	}
+	if chapter == model.ChapterOneThing {
+		return len([]rune(content)) >= 1
+	}
+	return len([]rune(content)) >= 4
 }
 
 func (e *Engine) buildFragment(subjectID string, chapter model.Chapter, msg model.InterviewMessage) *model.MemoryFragment {
@@ -103,7 +114,9 @@ func (e *Engine) saveFragment(f *model.MemoryFragment) error {
 }
 
 func boolToInt(b bool) int {
-	if b { return 1 }
+	if b {
+		return 1
+	}
 	return 0
 }
 
@@ -120,11 +133,31 @@ func extractSensoryTags(text string) map[string][]string {
 	tasteWords := []string{"甜", "酸", "苦", "辣", "咸", "淡", "好吃", "难吃", "烫", "凉", "热", "冷"}
 	touchWords := []string{"软", "硬", "凉", "热", "冷", "暖", "烫", "扎", "刺", "滑", "粗", "细", "茧", "手", "摸", "碰", "抱", "拍", "握"}
 
-	for _, w := range sightWords { if strings.Contains(text, w) { tags["sight"] = append(tags["sight"], w) } }
-	for _, w := range soundWords { if strings.Contains(text, w) { tags["sound"] = append(tags["sound"], w) } }
-	for _, w := range smellWords { if strings.Contains(text, w) { tags["smell"] = append(tags["smell"], w) } }
-	for _, w := range tasteWords { if strings.Contains(text, w) { tags["taste"] = append(tags["taste"], w) } }
-	for _, w := range touchWords { if strings.Contains(text, w) { tags["touch"] = append(tags["touch"], w) } }
+	for _, w := range sightWords {
+		if strings.Contains(text, w) {
+			tags["sight"] = append(tags["sight"], w)
+		}
+	}
+	for _, w := range soundWords {
+		if strings.Contains(text, w) {
+			tags["sound"] = append(tags["sound"], w)
+		}
+	}
+	for _, w := range smellWords {
+		if strings.Contains(text, w) {
+			tags["smell"] = append(tags["smell"], w)
+		}
+	}
+	for _, w := range tasteWords {
+		if strings.Contains(text, w) {
+			tags["taste"] = append(tags["taste"], w)
+		}
+	}
+	for _, w := range touchWords {
+		if strings.Contains(text, w) {
+			tags["touch"] = append(tags["touch"], w)
+		}
+	}
 
 	return tags
 }
@@ -146,13 +179,27 @@ func extractTimeTags(text string) []map[string]interface{} {
 	years := extractYears(text)
 	for _, y := range years {
 		t := map[string]interface{}{"year": y}
-		if strings.Contains(text, "冬") { t["season"] = "冬" }
-		if strings.Contains(text, "夏") { t["season"] = "夏" }
-		if strings.Contains(text, "春") { t["season"] = "春" }
-		if strings.Contains(text, "秋") { t["season"] = "秋" }
-		if strings.Contains(text, "早上") || strings.Contains(text, "早晨") { t["time_of_day"] = "早上" }
-		if strings.Contains(text, "晚上") { t["time_of_day"] = "晚上" }
-		if strings.Contains(text, "下午") { t["time_of_day"] = "下午" }
+		if strings.Contains(text, "冬") {
+			t["season"] = "冬"
+		}
+		if strings.Contains(text, "夏") {
+			t["season"] = "夏"
+		}
+		if strings.Contains(text, "春") {
+			t["season"] = "春"
+		}
+		if strings.Contains(text, "秋") {
+			t["season"] = "秋"
+		}
+		if strings.Contains(text, "早上") || strings.Contains(text, "早晨") {
+			t["time_of_day"] = "早上"
+		}
+		if strings.Contains(text, "晚上") {
+			t["time_of_day"] = "晚上"
+		}
+		if strings.Contains(text, "下午") {
+			t["time_of_day"] = "下午"
+		}
 		times = append(times, t)
 	}
 	return times
@@ -210,7 +257,9 @@ func extractEmotions(text string) []map[string]interface{} {
 
 func calcAnchorPotential(f *model.MemoryFragment) int {
 	score := 0
-	if f.HasMusic { score += 3 }
+	if f.HasMusic {
+		score += 3
+	}
 	// Check for high emotion
 	var emotions []map[string]interface{}
 	json.Unmarshal([]byte(f.EmotionTags), &emotions)
@@ -220,14 +269,28 @@ func calcAnchorPotential(f *model.MemoryFragment) int {
 			break
 		}
 	}
-	if f.IsProcedural { score += 2 }
+	if f.IsProcedural {
+		score += 2
+	}
 	var sensory map[string][]string
 	json.Unmarshal([]byte(f.SensoryTags), &sensory)
-	if len(sensory["sound"]) > 0 { score += 1 }
-	if len(sensory["taste"]) > 0 { score += 1 }
-	if len(sensory["smell"]) > 0 { score += 1 }
-	if len(sensory["touch"]) > 0 { score += 1 }
-	if score > 10 { score = 10 }
-	if score < 0 { score = 0 }
+	if len(sensory["sound"]) > 0 {
+		score += 1
+	}
+	if len(sensory["taste"]) > 0 {
+		score += 1
+	}
+	if len(sensory["smell"]) > 0 {
+		score += 1
+	}
+	if len(sensory["touch"]) > 0 {
+		score += 1
+	}
+	if score > 10 {
+		score = 10
+	}
+	if score < 0 {
+		score = 0
+	}
 	return score
 }

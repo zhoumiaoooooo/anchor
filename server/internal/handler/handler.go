@@ -114,6 +114,9 @@ func (h *Handler) RespondChapter(w http.ResponseWriter, r *http.Request, subject
 		jsonError(w, "session_id 和 content 不能为空", http.StatusBadRequest)
 		return
 	}
+	if !h.sessionBelongsToSubject(w, req.SessionID, subjectID) {
+		return
+	}
 
 	resp, err := h.engine.ProcessResponse(req.SessionID, req.Content, 0)
 	if err != nil {
@@ -129,6 +132,13 @@ func (h *Handler) CompleteChapter(w http.ResponseWriter, r *http.Request, subjec
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		jsonError(w, "无效的请求", http.StatusBadRequest)
+		return
+	}
+	if req.SessionID == "" {
+		jsonError(w, "session_id 不能为空", http.StatusBadRequest)
+		return
+	}
+	if !h.sessionBelongsToSubject(w, req.SessionID, subjectID) {
 		return
 	}
 	count, err := h.engine.CompleteChapter(req.SessionID)
@@ -228,13 +238,26 @@ func (h *Handler) ListMemories(w http.ResponseWriter, r *http.Request, subjectID
 // --- Helpers ---
 
 func jsonOK(w http.ResponseWriter, status int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
 }
 
 func jsonError(w http.ResponseWriter, msg string, status int) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}
+
+func (h *Handler) sessionBelongsToSubject(w http.ResponseWriter, sessionID string, subjectID string) bool {
+	ok, err := h.engine.SessionBelongsToSubject(sessionID, subjectID)
+	if err != nil {
+		jsonError(w, "会话校验失败", http.StatusInternalServerError)
+		return false
+	}
+	if !ok {
+		jsonError(w, "会话不属于当前人物", http.StatusForbidden)
+		return false
+	}
+	return true
 }

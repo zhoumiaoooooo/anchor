@@ -12,17 +12,17 @@ import (
 )
 
 type Engine struct {
-	db       *sql.DB
-	llm      *llm.Client
-	danger   *DangerDetector
+	db        *sql.DB
+	llm       *llm.Client
+	danger    *DangerDetector
 	sysPrompt string
 }
 
 func NewEngine(db *sql.DB, llmClient *llm.Client) *Engine {
 	return &Engine{
-		db:     db,
-		llm:    llmClient,
-		danger: &DangerDetector{},
+		db:        db,
+		llm:       llmClient,
+		danger:    &DangerDetector{},
 		sysPrompt: buildSystemPrompt(),
 	}
 }
@@ -30,13 +30,13 @@ func NewEngine(db *sql.DB, llmClient *llm.Client) *Engine {
 func buildSystemPrompt() string {
 	return `你是一位生命故事的倾听者和追问者。
 
-你的对话对象正在记录一个对他/她来说很重要的人。这是他/她第一次被人这样问。
+你的对话对象正在记录一个对 ta 来说很重要的人。这可能是 ta 第一次被人这样问。
 
 你的规则：
-1. 永远向下追问。当对方给出概括（"她是个坚强的人"），追问一件具体的事。
+1. 永远向下追问。当对方给出概括（"ta 是个坚强的人"），追问一件具体的事。
 2. 感官优先。在任何回答里寻找颜色、温度、声音、气味、触感、味道。追问那个感官。
 3. 保持轻。当回答变短、回避、或出现沉默——换方向。不说"你为什么不想说"。
-4. 绝对禁止说："我理解你的感受""这很正常""你要坚强""她一定很爱你""你真孝顺""你一定很……"。
+4. 绝对禁止说："我理解你的感受""这很正常""你要坚强""ta 一定很爱你""你真孝顺""你一定很……"。
 5. 禁止评价和总结用户说的内容。你只追问，不概括。
 6. 当对方给出好的具体回答时，轻轻确认（"嗯，这个我记下了"），然后自然地往下。
 7. 用口语。用短句。像朋友聊天。每次回复控制在1-3句话，不超过80字。
@@ -46,6 +46,10 @@ func buildSystemPrompt() string {
 
 // StartChapter creates or resumes a session and returns the AI opening message
 func (e *Engine) StartChapter(subjectID string, chapter model.Chapter) (*model.InterviewSession, *model.AIResponse, error) {
+	if _, ok := ChapterDefs[chapter]; !ok {
+		return nil, nil, fmt.Errorf("unknown chapter")
+	}
+
 	// Check if session already exists
 	existing, _ := e.getSession(subjectID, chapter)
 
@@ -113,6 +117,9 @@ func (e *Engine) ProcessResponse(sessionID string, userContent string, inputDura
 	session, err := e.getSessionByID(sessionID)
 	if err != nil {
 		return nil, err
+	}
+	if session.Status == model.SessionCompleted {
+		return nil, fmt.Errorf("chapter already completed")
 	}
 
 	def := ChapterDefs[session.Chapter]
@@ -227,7 +234,9 @@ func (e *Engine) handleOneThing(session *model.InterviewSession, userContent str
 	)
 
 	// Auto-complete the chapter
-	e.CompleteChapter(session.ID)
+	if _, err := e.CompleteChapter(session.ID); err != nil {
+		return nil, err
+	}
 
 	return &model.AIResponse{Message: closing}, nil
 }
@@ -238,11 +247,16 @@ func (e *Engine) CompleteChapter(sessionID string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	if session.Status == model.SessionCompleted {
+		return 0, nil
+	}
 
-	e.db.Exec(
+	if _, err := e.db.Exec(
 		`UPDATE interview_sessions SET status = 'completed', completed_at = datetime('now') WHERE id = ?`,
 		sessionID,
-	)
+	); err != nil {
+		return 0, err
+	}
 
 	// Extract memory fragments from the conversation
 	return e.extractFragments(session)
@@ -265,22 +279,9 @@ func (e *Engine) GetProgress(subjectID string) (*model.InterviewProgress, error)
 			cp.MessageCount = count
 		}
 
-		// First chapter is always available, subsequent chapters unlock as prior ones complete
-		if ch == model.AllChapters[0] {
-			if cp.Status == "locked" {
-				cp.Status = "available"
-			}
-		} else {
-			// Check if previous chapter is completed
-			prevCh := getPrevChapter(ch)
-			if prevCh != nil {
-				prevSession, _ := e.getSession(subjectID, *prevCh)
-				if prevSession != nil && prevSession.Status == model.SessionCompleted {
-					if cp.Status == "locked" {
-						cp.Status = "available"
-					}
-				}
-			}
+		// All chapters are always available — user can enter in any order
+		if cp.Status == "locked" {
+			cp.Status = "available"
 		}
 
 		progress.Chapters = append(progress.Chapters, cp)
@@ -292,6 +293,18 @@ func (e *Engine) GetProgress(subjectID string) (*model.InterviewProgress, error)
 // GetSessionMessages returns all messages for a session
 func (e *Engine) GetSessionMessages(sessionID string) ([]model.InterviewMessage, error) {
 	return e.getMessages(sessionID)
+}
+
+func (e *Engine) SessionBelongsToSubject(sessionID string, subjectID string) (bool, error) {
+	var count int
+	err := e.db.QueryRow(
+		`SELECT COUNT(*) FROM interview_sessions WHERE id = ? AND subject_id = ?`,
+		sessionID, subjectID,
+	).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 // --- Internal helpers ---
@@ -406,7 +419,7 @@ func (e *Engine) checkMediaOpportunity(chapter model.Chapter, content string) *m
 	if chapter == model.ChapterVoice && (containsAny(content, []string{"唱", "歌", "哼", "叫", "笑声", "哭"})) {
 		return &model.MediaPrompt{
 			Type: "voice",
-			Text: "你现在能试着模仿一下她吗？录一小段，不用像。",
+			Text: "你现在能试着模仿一下 ta 吗？录一小段，不用像。",
 		}
 	}
 	if chapter == model.ChapterHand && containsAny(content, []string{"照片", "相片", "老照片"}) {
