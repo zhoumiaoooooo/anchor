@@ -56,7 +56,7 @@
 
 - 一台电脑（Windows / Mac / Linux 都可以）
 - [Go](https://go.dev/dl/) 1.22 或更高版本
-- 一个 [DeepSeek](https://platform.deepseek.com/) API key（[在这里获取](https://platform.deepseek.com/api_keys)，新用户有免费额度）
+- 一个 DeepSeek API key
 
 ### 步骤
 
